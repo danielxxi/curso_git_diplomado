@@ -1,0 +1,113 @@
+# Manifiestos de Kubernetes para el tutorial de Docker y Kubernetes
+---
+# Namespace para organizar recursos
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: docker-kubernetes-tutorial
+  labels:
+    app: tutorial
+
+---
+# Deployment - Define cómo ejecutar la aplicación
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app-web
+  namespace: docker-kubernetes-tutorial
+  labels:
+    app: mi-app-web
+    version: v1
+spec:
+  replicas: 3  # Ejecutar 3 instancias de la aplicación
+  selector:
+    matchLabels:
+      app: mi-app-web
+  template:
+    metadata:
+      labels:
+        app: mi-app-web
+        version: v1
+    spec:
+      containers:
+      - name: app
+        image: mi-app-web:latest
+        imagePullPolicy: Never  # Usar imagen local
+        ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 2
+        # Recursos
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        # Variables de entorno
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+
+---
+# Service - Expone la aplicación en la red
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-web
+  namespace: docker-kubernetes-tutorial
+  labels:
+    app: mi-app-web
+spec:
+  type: LoadBalancer
+  selector:
+    app: mi-app-web
+  ports:
+  - port: 8080
+    targetPort: 5000
+    protocol: TCP
+    name: http
+
+---
+# HorizontalPodAutoscaler - Escala automáticamente basado en CPU
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mi-app-web-hpa
+  namespace: docker-kubernetes-tutorial
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mi-app-web
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
