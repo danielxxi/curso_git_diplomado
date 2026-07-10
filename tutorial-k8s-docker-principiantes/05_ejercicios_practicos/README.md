@@ -447,6 +447,409 @@ kubectl describe pod pod-nombre
 
 ---
 
+## 📝 Ejercicio 6: Dockerfile Optimizado
+
+**Objetivo:** Crear imagen de 50MB (vs 500MB)
+
+**Inicio:** Crea un Dockerfile que pese 500MB+
+
+**main.py:**
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return {'message': 'Hola'}
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+**Dockerfile ingenuo (MALO):**
+```dockerfile
+FROM ubuntu:22.04
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip
+RUN pip install flask
+COPY main.py /app/
+CMD ["python3", "/app/main.py"]
+```
+
+**Tarea:** Optimizarlo a menos de 50MB
+
+**Solución (BUENO):**
+```dockerfile
+FROM python:3.11-alpine
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY main.py .
+USER nobody
+CMD ["python", "main.py"]
+```
+
+**Verifica tamaño:**
+```bash
+docker build -t mi-app:ingenu .
+docker build -t mi-app:optimizado -f Dockerfile.optimized .
+
+docker images | grep mi-app
+```
+
+---
+
+## 📝 Ejercicio 7: Docker Compose Multi-servicio
+
+**Objetivo:** Orquestar 4 servicios
+
+**Servicios:**
+1. Frontend (Nginx)
+2. API Backend (Flask)
+3. Base de datos (PostgreSQL)
+4. Cache (Redis)
+
+**docker-compose.yml:**
+```yaml
+version: '3.8'
+
+services:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://user:pass@db:5432/mydb
+      REDIS_URL: redis://cache:6379
+    depends_on:
+      - db
+      - cache
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres-data:
+```
+
+**Tarea:**
+1. Crear archivos de frontend y backend
+2. Ejecutar: `docker-compose up`
+3. Verificar que todos los servicios corren
+4. Acceder a http://localhost
+
+---
+
+## 📝 Ejercicio 8: Actualizar sin downtime
+
+**Objetivo:** Rolling update sin que la app caiga
+
+**Deployment:**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+    spec:
+      containers:
+      - name: app
+        image: mi-app:1.0
+        ports:
+        - containerPort: 5000
+```
+
+**Tarea:**
+```bash
+# 1. Desplegar v1.0
+kubectl apply -f deployment.yaml
+
+# 2. Verificar pods
+kubectl get pods
+
+# 3. Actualizar imagen
+kubectl set image deployment/mi-app app=mi-app:2.0
+
+# 4. Ver progreso
+kubectl rollout status deployment/mi-app
+
+# 5. Ver historial
+kubectl rollout history deployment/mi-app
+
+# 6. Deshacer si sale mal
+kubectl rollout undo deployment/mi-app
+```
+
+---
+
+## 📝 Ejercicio 9: Secrets y ConfigMaps
+
+**Objetivo:** Gestionar configuración y datos sensibles
+
+**ConfigMap:**
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_ENV: production
+  LOG_LEVEL: info
+  DATABASE_HOST: postgres
+```
+
+**Secret:**
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+data:
+  DATABASE_PASSWORD: cGFzc3dvcmQxMjM=  # base64 de "password123"
+  API_KEY: bXlhcGlrZXk=  # base64 de "myapikey"
+```
+
+**Deployment usándolos:**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: mi-app:1.0
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+```
+
+**Tarea:**
+```bash
+# 1. Crear ConfigMap
+kubectl apply -f configmap.yaml
+
+# 2. Crear Secret
+kubectl apply -f secret.yaml
+
+# 3. Desplegar
+kubectl apply -f deployment.yaml
+
+# 4. Verificar
+kubectl describe pod <pod-name>
+
+# 5. Ver variables de entorno
+kubectl exec <pod-name> -- env | grep APP
+```
+
+---
+
+## 📝 Ejercicio 10: Network Policy
+
+**Objetivo:** Aislamiento de red entre pods
+
+**Escenario:**
+- Frontend puede hablar con Backend
+- Backend puede hablar con BD
+- BD no puede hablar con Frontend
+- Todo lo demás bloqueado
+
+**NetworkPolicy:**
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 5000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: db
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53  # DNS
+```
+
+---
+
+## 📝 Ejercicio 11: Persistencia en Kubernetes
+
+**Objetivo:** Datos que persisten entre pod restarts
+
+**PersistentVolume:**
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mi-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/mi-app
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mi-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: mi-app:1.0
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: mi-pvc
+```
+
+---
+
+## 📝 Ejercicio 12: Helm Chart
+
+**Objetivo:** Empaquetar tu app con Helm
+
+**Estructura:**
+```
+my-app-chart/
+├── Chart.yaml
+├── values.yaml
+├── templates/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── ingress.yaml
+└── README.md
+```
+
+**Chart.yaml:**
+```yaml
+apiVersion: v2
+name: my-app
+description: Mi aplicación
+version: 1.0.0
+appVersion: "1.0.0"
+```
+
+**values.yaml:**
+```yaml
+replicaCount: 3
+image:
+  repository: mi-app
+  tag: "1.0"
+  pullPolicy: IfNotPresent
+service:
+  type: LoadBalancer
+  port: 80
+```
+
+**templates/deployment.yaml:**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    spec:
+      containers:
+      - name: app
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+```
+
+**Usar:**
+```bash
+# Empaquetar
+helm package my-app-chart/
+
+# Instalar
+helm install my-release ./my-app-chart/
+
+# Con valores custom
+helm install my-release ./my-app-chart/ \
+  --set replicaCount=5 \
+  --set image.tag=2.0
+```
+
+---
+
 ## ✅ Soluciones
 
 Las soluciones de los ejercicios están en la carpeta `soluciones/`
@@ -457,7 +860,14 @@ ls soluciones/
 ├── 02-wordpress/
 ├── 03-microservicios/
 ├── 04-scaling/
-└── 05-monitoreo/
+├── 05-monitoreo/
+├── 06-dockerfile-optimizado/
+├── 07-docker-compose-multi/
+├── 08-rolling-update/
+├── 09-secrets-configmaps/
+├── 10-network-policy/
+├── 11-persistencia/
+└── 12-helm-chart/
 ```
 
 ---

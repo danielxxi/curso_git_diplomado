@@ -14,11 +14,19 @@ Aprenderás qué son Docker y Kubernetes sin necesidad de instalar nada aún.
 
 ```
 00_conceptos_basicos/
-├── 01_que_es_docker.md           # ¿Qué es Docker? Conceptos fundamentales
-├── 02_que_es_kubernetes.md       # ¿Qué es Kubernetes? Introducción
-├── 03_diferencias_vm_docker.md   # ¿Por qué Docker es mejor que VMs?
-├── 04_casos_uso_reales.md        # Casos de uso en empresas
-└── 05_roadmap_completo.md        # Mapa de ruta de aprendizaje
+├── README.md                 # Toda la teoría en una lección
+```
+
+---
+
+### **Nivel 0.5: Instalación Completa** 
+**Duración estimada: 45-60 minutos**
+
+Instala Docker, Kubernetes y todas las herramientas en tu sistema operativo.
+
+```
+0.5_instalacion_completa/
+├── README.md                 # Instalación paso a paso para macOS, Linux, Windows
 ```
 
 ---
@@ -30,16 +38,7 @@ Instalación, conceptos fundamentales y primeros pasos con Docker.
 
 ```
 01_docker_basico/
-├── 01_instalacion_macos.md       # Paso a paso: Docker Desktop en macOS
-├── 02_instalacion_linux.md       # Paso a paso: Docker en Linux
-├── 03_instalacion_windows.md     # Paso a paso: Docker en Windows
-├── 04_conceptos_docker.md        # Imágenes, contenedores, registros
-├── 05_primer_contenedor.md       # Tu primer "Hola Docker"
-├── 06_dockerfile_basico.md       # Crear tu propia imagen
-├── 07_volumenes.md               # Persistencia de datos
-├── 08_redes_docker.md            # Comunicación entre contenedores
-├── 09_docker_compose_intro.md    # Múltiples contenedores juntos
-└── 10_ejercicios_nivel1.md       # Ejercicios prácticos
+├── README.md                 # Paso a paso desde cero
 ```
 
 ---
@@ -51,16 +50,7 @@ Conceptos avanzados, optimización y buenas prácticas.
 
 ```
 02_docker_intermedio/
-├── 01_optimization_imagenes.md   # Reducir tamaño de imágenes
-├── 02_multistage_builds.md       # Construcción multi-etapa
-├── 03_docker_networking.md       # Redes avanzadas
-├── 04_registros_privados.md      # Docker Hub, registros privados
-├── 05_seguridad_docker.md        # Mejores prácticas de seguridad
-├── 06_docker_compose_avanzado.md # Compose con variables, overlays
-├── 07_dockerfile_best_practices.md # Buenas prácticas
-├── 08_health_checks.md           # Verificar salud de contenedores
-├── 09_logs_debugging.md          # Logging y troubleshooting
-└── 10_ejercicios_nivel2.md       # Ejercicios avanzados
+├── README.md                 # Multi-stage, optimización, seguridad, best practices
 ```
 
 ---
@@ -72,18 +62,7 @@ Primeros pasos en Kubernetes, conceptos fundamentales.
 
 ```
 03_kubernetes_basico/
-├── 01_instalacion_k8s.md         # Instalar Kubernetes local (minikube/Docker Desktop)
-├── 02_conceptos_k8s.md           # Pods, Deployments, Services, Namespaces
-├── 03_kubectl_basico.md          # Comandos kubectl esenciales
-├── 04_pods_basicos.md            # Crear y gestionar pods
-├── 05_deployments.md             # Deployments: replicación y actualizaciones
-├── 06_services.md                # Exponiendo aplicaciones (ClusterIP, NodePort, LoadBalancer)
-├── 07_labels_selectors.md        # Etiquetas y selectores
-├── 08_namespaces.md              # Separación lógica de recursos
-├── 09_volumenes_k8s.md           # Almacenamiento persistente
-├── 10_configmaps_secrets.md      # Configuración y datos sensibles
-├── 11_primeros_pasos.md          # Tu primer despliegue en K8s
-└── 12_ejercicios_nivel3.md       # Ejercicios prácticos
+├── README.md                 # Instalación K8s, Pods, Deployments, Services
 ```
 
 ---
@@ -95,17 +74,7 @@ Conceptos avanzados, monitoreo, escalado, seguridad.
 
 ```
 04_kubernetes_intermedio/
-├── 01_replicasets_daemonsets.md  # Otros tipos de controladores
-├── 02_statefulsets.md            # Aplicaciones stateful
-├── 03_ingress.md                 # Enrutamiento HTTP/HTTPS
-├── 04_hpa.md                     # Auto-escalado horizontal
-├── 05_rbac.md                    # Control de acceso basado en roles
-├── 06_network_policies.md        # Políticas de red
-├── 07_logging_monitoring.md      # Logs y métricas
-├── 08_helm_basics.md             # Gestión de aplicaciones con Helm
-├── 09_troubleshooting.md         # Debugging y solución de problemas
-├── 10_security_best_practices.md # Seguridad en Kubernetes
-└── 11_ejercicios_nivel4.md       # Ejercicios avanzados
+├── README.md                 # StatefulSets, Ingress, HPA, RBAC, Monitoring, Helm
 ```
 
 ---
@@ -117,12 +86,7 @@ Proyectos integrados aplicando todo lo aprendido.
 
 ```
 05_ejercicios_practicos/
-├── 01_todo_app/                  # App Todo simple en Docker y K8s
-├── 02_blog_wordpress/            # WordPress con base de datos
-├── 03_api_rest_python/           # API REST con FastAPI
-├── 04_microservicios/            # Arquitectura de microservicios
-├── 05_ci_cd_basics/              # Pipeline CI/CD básico
-└── EJERCICIOS_RESUELTOS.md       # Soluciones
+├── README.md                 # 12 ejercicios progresivos (desde TODO app hasta Helm)
 ```
 
 ---
@@ -134,11 +98,7 @@ Proyectos para producción y portafolio.
 
 ```
 06_proyectos_reales/
-├── 01_ecommerce/                 # E-commerce completo
-├── 02_saas_app/                  # Aplicación SaaS
-├── 03_data_pipeline/             # Pipeline de datos
-├── 04_monitoreo_produccion/      # Monitoreo y alertas
-└── PROYECTOS_COMPLETOS.md        # Descripción completa
+├── README.md                 # E-commerce, SaaS, Pipeline de datos, Microservicios
 ```
 
 ---
@@ -359,16 +319,18 @@ Si tienes dudas:
 
 ## 📅 Estimación de Tiempo
 
-| Nivel | Duración | Horas |
-|-------|----------|-------|
-| Conceptos Básicos | 2-3 horas | 2-3 |
-| Docker Básico | 1-2 semanas | 8-10 |
-| Docker Intermedio | 1-2 semanas | 8-10 |
-| Kubernetes Básico | 1-2 semanas | 10-12 |
-| Kubernetes Intermedio | 1-2 semanas | 10-12 |
-| **Total aprendizaje** | **5-9 semanas** | **40-50** |
-| Ejercicios prácticos | Variable | 20+ |
-| Proyectos reales | Variable | 30+ |
+| Nivel | Tema | Duración | Horas |
+|-------|------|----------|-------|
+| 0 | Conceptos Básicos | 2-3 horas | 2-3 |
+| 0.5 | Instalación Completa | 45-60 min | 1 |
+| 1 | Docker Básico | 1-2 semanas | 8-10 |
+| 2 | Docker Intermedio | 1-2 semanas | 8-10 |
+| 3 | Kubernetes Básico | 1-2 semanas | 10-12 |
+| 4 | Kubernetes Intermedio | 1-2 semanas | 10-12 |
+| 5 | Ejercicios Prácticos | 2-3 semanas | 20+ |
+| 6 | Proyectos Reales | 4-8 semanas | 40+ |
+| **TOTAL LEARNING** | **Todos los módulos** | **10-16 semanas** | **60-80** |
+| **+ Proyectos** | **Con proyectos** | **12-20 semanas** | **100-120** |
 
 ---
 
@@ -394,14 +356,17 @@ Este tutorial es libre para uso personal y educativo.
 
 ### Siguiente paso según tu nivel:
 
-**Si eres total principiante:**
+**Si eres TOTAL PRINCIPIANTE:**
 → Inicia con [`00_conceptos_basicos/README.md`](./00_conceptos_basicos/README.md)
 
-**Si entiendes conceptos básicos:**
-→ Inicia con [`01_docker_basico/01_instalacion_macos.md`](./01_docker_basico/01_instalacion_macos.md)
+**Si entiendes conceptos pero necesitas instalar:**
+→ Inicia con [`0.5_instalacion_completa/README.md`](./0.5_instalacion_completa/README.md)
 
-**Si tienes experiencia con Docker:**
-→ Inicia con [`03_kubernetes_basico/01_instalacion_k8s.md`](./03_kubernetes_basico/01_instalacion_k8s.md)
+**Si tienes Docker pero no Kubernetes:**
+→ Inicia con [`03_kubernetes_basico/README.md`](./03_kubernetes_basico/README.md)
+
+**Si tienes experiencia y quieres profundizar:**
+→ Inicia con [`02_docker_intermedio/README.md`](./02_docker_intermedio/README.md) o [`04_kubernetes_intermedio/README.md`](./04_kubernetes_intermedio/README.md)
 
 ---
 
